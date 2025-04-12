@@ -1,0 +1,197 @@
+.game-container {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "hud hud"
+    "game minimap"
+    "controls controls";
+  height: 100vh;
+  background-color: #0a0a0a;
+  color: white;
+}
+
+.game-hud {
+  grid-area: hud;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #333;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat span:first-child {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.stat span:last-child {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4a74e8;
+}
+
+.exit-button {
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.exit-button:hover {
+  background-color: #555;
+}
+
+.canvas-container {
+  grid-area: game;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.maze-canvas,
+.fog-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fog-canvas {
+  pointer-events: none;
+}
+
+.minimap-container {
+  grid-area: minimap;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a1a;
+  border-left: 2px solid #333;
+}
+
+.minimap-container h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #4a74e8;
+}
+
+.minimap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 2px solid #333;
+  align-self: center;
+  background-color: #333;
+}
+
+.minimap-row {
+  display: flex;
+  gap: 1px;
+}
+
+.minimap-cell {
+  width: 6px;
+  height: 6px;
+  background-color: #222;
+}
+
+.minimap-cell.path {
+  background-color: #444;
+}
+
+.minimap-cell.wall {
+  background-color: #111;
+}
+
+.minimap-cell.start {
+  background-color: #4a74e8;
+}
+
+.minimap-cell.exit {
+  background-color: #8149e8;
+}
+
+.minimap-cell.player {
+  background-color: #e84a74;
+}
+
+.minimap-cell.fogged {
+  background-color: #000;
+}
+
+.controls-help {
+  grid-area: controls;
+  padding: 0.5rem;
+  background-color: #1a1a1a;
+  text-align: center;
+  border-top: 2px solid #333;
+}
+
+.difficulty-menu,
+.loading-screen,
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #121212;
+  color: white;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.difficulty-buttons button,
+.back-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #1e1e1e;
+  color: white;
+  border: 2px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficulty-buttons button:hover,
+.back-button:hover {
+  border-color: #4a74e8;
+  transform: translateY(-3px);
+}
+
+.spinner {
+  margin-top: 2rem;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(74, 116, 232, 0.3);
+  border-radius: 50%;
+  border-top-color: #4a74e8;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

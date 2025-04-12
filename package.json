@@ -1,0 +1,35 @@
+{
+    "name": "maze-runner",
+    "version": "1.0.0",
+    "description": "A top-down 2D maze exploration game with fog of war mechanics",
+    "main": "server/index.js",
+    "scripts": {
+        "start": "node server/index.js",
+        "dev:server": "nodemon server/index.js",
+        "dev:client": "cd client && npm start",
+        "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+        "install:all": "npm install && cd client && npm install",
+        "build": "cd client && npm run build"
+    },
+    "keywords": [
+        "game",
+        "maze",
+        "fog of war",
+        "2D"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.18.2",
+        "socket.io": "^4.7.2",
+        "uuid": "^9.0.1",
+        "mongoose": "^7.5.2",
+        "dotenv": "^16.3.1",
+        "bcryptjs": "^2.4.3",
+        "jsonwebtoken": "^9.0.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1",
+        "concurrently": "^8.2.1"
+    }
+}
