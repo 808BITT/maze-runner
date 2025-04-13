@@ -106,18 +106,22 @@ const SinglePlayerGame = () => {
             switch (e.key) {
                 case 'ArrowUp':
                 case 'w':
+                case 'k': // Vim up
                     direction = 'up';
                     break;
                 case 'ArrowRight':
                 case 'd':
+                case 'l': // Vim right
                     direction = 'right';
                     break;
                 case 'ArrowDown':
                 case 's':
+                case 'j': // Vim down
                     direction = 'down';
                     break;
                 case 'ArrowLeft':
                 case 'a':
+                case 'h': // Vim left
                     direction = 'left';
                     break;
                 default:
@@ -290,7 +294,7 @@ const SinglePlayerGame = () => {
 
             {/* Controls help */}
             <div className="controls-help">
-                <p>Use WASD or Arrow keys to move</p>
+                <p>Use WASD, Arrow keys, or Vim keys (HJKL) to move</p>
             </div>
         </div>
     );
