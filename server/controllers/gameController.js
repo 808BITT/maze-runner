@@ -4,7 +4,7 @@
  * Handles game-related actions like player movement and game completion
  */
 
-const { updatePlayerPosition, calculateFinalScore } = require('../utils/gameState');
+const { updatePlayerPosition, calculateFinalScore, activeGames } = require('../utils/gameState');
 
 /**
  * Handle player movement in the maze
@@ -15,9 +15,13 @@ const { updatePlayerPosition, calculateFinalScore } = require('../utils/gameStat
  */
 function handlePlayerMovement(userId, direction) {
     try {
+        console.log('handlePlayerMovement called with:', { userId, direction });
+
         // Get current game state from the in-memory store
         // This would typically come from a database in production
-        const gameState = require('../utils/gameState').activeGames.get(userId);
+        const gameState = activeGames.get(userId);
+
+        console.log('Current game state:', gameState);
 
         if (!gameState) {
             throw new Error('Game not found');
@@ -42,6 +46,8 @@ function handlePlayerMovement(userId, direction) {
             default:
                 throw new Error('Invalid direction');
         }
+
+        console.log('New calculated position:', newPosition);
 
         // Check if new position is valid (not a wall)
         if (isValidMove(gameState.maze.grid, newPosition)) {

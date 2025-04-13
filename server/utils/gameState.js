@@ -244,5 +244,6 @@ function countVisibleCells(fogGrid) {
 module.exports = {
     initializeGameState,
     updatePlayerPosition,
-    calculateFinalScore
+    calculateFinalScore,
+    activeGames  // Export the activeGames map
 };

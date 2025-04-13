@@ -26,6 +26,7 @@
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^7.5.2",
         "socket.io": "^4.7.2",
+        "three": "^0.175.0",
         "uuid": "^9.0.1",
         "vite": "^6.2.6"
     },

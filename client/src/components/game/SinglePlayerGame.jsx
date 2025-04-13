@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import './SinglePlayerGame.css';
+import ThreeDMaze from './ThreeDMaze';
 
 // Import game utilities
-import { renderFogOfWar, renderMaze, renderPlayer } from '../../utils/gameRenderer';
 
 // Add a debug flag to enable or disable logging
 const DEBUG = import.meta.env.VITE_DEBUG === 'true';
@@ -27,8 +27,6 @@ const SinglePlayerGame = () => {
     const [error, setError] = useState(null);
 
     const socketRef = useRef();
-    const canvasRef = useRef();
-    const fogCanvasRef = useRef();
 
     // Handle difficulty selection and start game
     const startGame = (selectedDifficulty) => {
@@ -138,32 +136,18 @@ const SinglePlayerGame = () => {
         };
     }, [gameState]);
 
-    // Render maze, fog, and player when game state updates
-    useEffect(() => {
-        if (!gameState) return;
+    // Handle player movement from ThreeDMaze
+    const handlePlayerMove = (direction) => {
+        if (!gameState || gameState.status !== 'active' || !socketRef.current) return;
 
-        const mazeCanvas = canvasRef.current;
-        const fogCanvas = fogCanvasRef.current;
+        logDebug('Player move requested', { direction });
 
-        if (!mazeCanvas || !fogCanvas) return;
-
-        const mazeCtx = mazeCanvas.getContext('2d');
-        const fogCtx = fogCanvas.getContext('2d');
-
-        // Clear canvases
-        mazeCtx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
-        fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
-
-        // Render maze background
-        renderMaze(mazeCtx, gameState.maze);
-
-        // Render fog of war overlay
-        renderFogOfWar(fogCtx, gameState.fogGrid);
-
-        // Render player
-        renderPlayer(mazeCtx, gameState.playerPosition, gameState.maze);
-
-    }, [gameState]);
+        // Send movement to server
+        socketRef.current.emit('movePlayer', {
+            userId: gameState.userId,
+            direction
+        });
+    };
 
     // Clean up socket connection when component unmounts
     useEffect(() => {
@@ -220,75 +204,15 @@ const SinglePlayerGame = () => {
 
     return (
         <div className="game-container">
-            {/* Game HUD */}
-            <div className="game-hud">
-                <div className="stats">
-                    <div className="stat">
-                        <span>Fog Remaining:</span>
-                        <span>{gameState?.fogPercentage.toFixed(2)}%</span>
-                    </div>
-                    <div className="stat">
-                        <span>Steps:</span>
-                        <span>{gameState?.steps || 0}</span>
-                    </div>
-                    <div className="stat">
-                        <span>Time:</span>
-                        <span>{Math.floor((Date.now() - gameState?.startTime) / 1000)}s</span>
-                    </div>
-                </div>
-
-                <button className="exit-button" onClick={exitToMainMenu}>Exit</button>
-            </div>
-
-            {/* Game Canvas */}
-            <div className="canvas-container">
-                <canvas
-                    ref={canvasRef}
-                    width={gameState?.maze.width * 20}
-                    height={gameState?.maze.height * 20}
-                    className="maze-canvas"
+            {gameState && (
+                <ThreeDMaze
+                    mazeData={{
+                        ...gameState.maze,
+                        playerPosition: gameState.playerPosition
+                    }}
+                    onPlayerMove={handlePlayerMove}
                 />
-                <canvas
-                    ref={fogCanvasRef}
-                    width={gameState?.maze.width * 20}
-                    height={gameState?.maze.height * 20}
-                    className="fog-canvas"
-                />
-            </div>
-
-            {/* Mini-map with fog of war */}
-            <div className="minimap-container">
-                <h3>Minimap</h3>
-                <div className="minimap">
-                    {gameState?.maze.grid.map((row, y) => (
-                        <div key={`row-${y}`} className="minimap-row">
-                            {row.map((cell, x) => {
-                                // Define cell type
-                                let cellType = '';
-                                if (cell === 1) cellType = 'wall';
-                                else if (cell === 2) cellType = 'start';
-                                else if (cell === 3) cellType = 'exit';
-                                else cellType = 'path';
-
-                                // Add player marker
-                                const isPlayer = gameState.playerPosition.x === x && gameState.playerPosition.y === y;
-
-                                // Add fog
-                                const isFogged = gameState.fogGrid[y][x] === 1;
-
-                                return (
-                                    <div
-                                        key={`cell-${x}-${y}`}
-                                        className={`minimap-cell ${cellType} ${isPlayer ? 'player' : ''} ${isFogged ? 'fogged' : ''}`}
-                                    />
-                                );
-                            })}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Controls help */}
+            )}
             <div className="controls-help">
                 <p>Use WASD or Arrow keys to move</p>
             </div>
