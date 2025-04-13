@@ -7,6 +7,15 @@
 // Cell size in pixels
 const CELL_SIZE = 20;
 
+// Add a debug flag to enable or disable logging
+const DEBUG = import.meta.env.REACT_APP_DEBUG === 'true';
+
+function logDebug(message, ...optionalParams) {
+    if (DEBUG) {
+        console.debug(`[DEBUG] ${message}`, ...optionalParams);
+    }
+}
+
 /**
  * Render the maze grid on the canvas
  * 
@@ -14,6 +23,7 @@ const CELL_SIZE = 20;
  * @param {object} maze - Maze data object
  */
 export function renderMaze(ctx, maze) {
+    logDebug('Rendering maze', maze);
     const { grid, width, height } = maze;
 
     // Set canvas dimensions
@@ -65,6 +75,7 @@ export function renderMaze(ctx, maze) {
  * @param {Array} fogGrid - 2D array representing fog of war (1=fogged, 0=visible)
  */
 export function renderFogOfWar(ctx, fogGrid) {
+    logDebug('Rendering fog of war', fogGrid);
     const height = fogGrid.length;
     const width = fogGrid[0].length;
 
@@ -95,6 +106,7 @@ export function renderFogOfWar(ctx, fogGrid) {
  * @param {object} maze - Maze data object (for dimensions)
  */
 export function renderPlayer(ctx, position, maze) {
+    logDebug('Rendering player', position, maze);
     const { x, y } = position;
 
     // Calculate center position of the cell
@@ -131,6 +143,7 @@ export function renderPlayer(ctx, position, maze) {
  * @returns {object} Viewport info {offsetX, offsetY, visibleWidth, visibleHeight}
  */
 export function calculateViewport(position, canvasWidth, canvasHeight, maze) {
+    logDebug('Calculating viewport', position, canvasWidth, canvasHeight, maze);
     const mazeWidthPx = maze.width * CELL_SIZE;
     const mazeHeightPx = maze.height * CELL_SIZE;
 

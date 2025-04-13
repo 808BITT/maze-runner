@@ -7,6 +7,15 @@
 // In-memory store for active game sessions (in production, this would use a database)
 const activeGames = new Map();
 
+// Add a debug flag to enable or disable logging
+const DEBUG = process.env.DEBUG === 'true';
+
+function logDebug(message, ...optionalParams) {
+    if (DEBUG) {
+        console.debug(`[DEBUG] ${message}`, ...optionalParams);
+    }
+}
+
 /**
  * Initialize a new game state for a player
  * 
@@ -15,22 +24,28 @@ const activeGames = new Map();
  * @returns {object} Initial game state
  */
 function initializeGameState(userId, maze) {
+    logDebug('Initializing game state', { userId, maze });
+
     // Create fog of war grid (1 = fogged, 0 = visible)
     const fogGrid = Array(maze.height).fill().map(() => Array(maze.width).fill(1));
+    logDebug('Fog grid created', fogGrid);
 
     // Set player position to start point
     const playerPosition = {
         x: maze.startX,
         y: maze.startY
     };
+    logDebug('Player position set', playerPosition);
 
     // Reveal area around player's starting position
     revealFogAroundPlayer(fogGrid, playerPosition, 2); // Visibility radius of 2
+    logDebug('Fog revealed around player', fogGrid);
 
     // Calculate total cells and initial fog percentage
     const totalCells = maze.width * maze.height;
     const initialVisibleCells = countVisibleCells(fogGrid);
     const fogPercentage = 100 - (initialVisibleCells / totalCells * 100);
+    logDebug('Fog percentage calculated', { totalCells, initialVisibleCells, fogPercentage });
 
     const gameState = {
         userId,
@@ -45,6 +60,7 @@ function initializeGameState(userId, maze) {
 
     // Store game state
     activeGames.set(userId, gameState);
+    logDebug('Game state stored', gameState);
 
     return gameState;
 }
@@ -65,27 +81,33 @@ function updatePlayerPosition(userId, position) {
 
     // Update position
     gameState.playerPosition = position;
+    logDebug('Player position updated', position);
 
     // Reveal fog around new position
     revealFogAroundPlayer(gameState.fogGrid, position, 2);
+    logDebug('Fog revealed around new position', gameState.fogGrid);
 
     // Update fog percentage
     const totalCells = gameState.maze.width * gameState.maze.height;
     const visibleCells = countVisibleCells(gameState.fogGrid);
     gameState.fogPercentage = 100 - (visibleCells / totalCells * 100);
+    logDebug('Fog percentage updated', gameState.fogPercentage);
 
     // Increment steps counter
     gameState.steps++;
+    logDebug('Steps incremented', gameState.steps);
 
     // Check if player reached exit
     if (position.x === gameState.maze.exitX && position.y === gameState.maze.exitY) {
         gameState.status = 'completed';
         gameState.endTime = Date.now();
         gameState.completionTime = (gameState.endTime - gameState.startTime) / 1000; // in seconds
+        logDebug('Game completed', { endTime: gameState.endTime, completionTime: gameState.completionTime });
     }
 
     // Update stored game state
     activeGames.set(userId, gameState);
+    logDebug('Game state updated', gameState);
 
     return gameState;
 }

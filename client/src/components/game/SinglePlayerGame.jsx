@@ -6,6 +6,18 @@ import './SinglePlayerGame.css';
 // Import game utilities
 import { renderFogOfWar, renderMaze, renderPlayer } from '../../utils/gameRenderer';
 
+// Add a debug flag to enable or disable logging
+const DEBUG = import.meta.env.VITE_DEBUG === 'true';
+
+function logDebug(message, ...optionalParams) {
+    if (DEBUG) {
+        console.debug(`[DEBUG] ${message}`, ...optionalParams);
+    }
+}
+
+// Add debug message to confirm VITE_DEBUG is loaded
+logDebug('Client debug mode is enabled');
+
 const SinglePlayerGame = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -20,31 +32,51 @@ const SinglePlayerGame = () => {
 
     // Handle difficulty selection and start game
     const startGame = (selectedDifficulty) => {
+        logDebug('startGame function called with difficulty:', selectedDifficulty);
+        logDebug('Starting game', { selectedDifficulty });
         setDifficulty(selectedDifficulty);
         setShowDifficultyMenu(false);
         setLoading(true);
 
         // Connect to server via Socket.io
-        socketRef.current = io();
+        const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+        socketRef.current = io(serverUrl);
+        logDebug('Socket initialized:', socketRef.current);
+        logDebug('Socket connected:', socketRef.current);
+
+        socketRef.current.on('connect', () => {
+            logDebug('Socket connected successfully:', socketRef.current.id);
+        });
+        socketRef.current.on('connect_error', (err) => {
+            logDebug('Socket connection error:', err);
+        });
 
         // Request new game with selected difficulty
         socketRef.current.emit('joinGame', {
             userId: 'player-' + Date.now(), // Temporary user ID for now
             difficulty: selectedDifficulty
         });
+        logDebug('Emitting joinGame event with data:', {
+            userId: 'player-' + Date.now(),
+            difficulty: selectedDifficulty
+        });
+        logDebug('joinGame event emitted', { userId: 'player-' + Date.now(), difficulty: selectedDifficulty });
 
         // Handle game initialization response
         socketRef.current.on('gameInitialized', (initialState) => {
+            logDebug('gameInitialized event received:', initialState);
             setGameState(initialState);
             setLoading(false);
         });
 
         // Handle game state updates
         socketRef.current.on('gameStateUpdate', (updatedState) => {
+            logDebug('gameStateUpdate event received', updatedState);
             setGameState(updatedState);
 
             // Check if game is completed
             if (updatedState.status === 'completed') {
+                logDebug('Game completed', updatedState);
                 socketRef.current.emit('completeGame', {
                     userId: updatedState.userId,
                     gameState: updatedState
@@ -54,12 +86,13 @@ const SinglePlayerGame = () => {
 
         // Handle game completion
         socketRef.current.on('gameCompleted', (results) => {
-            // Navigate to game over screen with results
+            logDebug('gameCompleted event received', results);
             navigate('/gameover', { state: { results } });
         });
 
         // Handle errors
         socketRef.current.on('error', (errorData) => {
+            logDebug('Error event received', errorData);
             setError(errorData.message);
         });
     };

@@ -1,6 +1,6 @@
 {
     "name": "maze-runner",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "A top-down 2D maze exploration game with fog of war mechanics",
     "main": "server/index.js",
     "scripts": {
