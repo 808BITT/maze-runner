@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Runner</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="ui-overlay">
+            <div id="minimap-container"></div>
+            <div id="stats-container">
+                <div id="fog-remaining">Fog Remaining: 100%</div>
+                <div id="timer">Time: 0:00</div>
+            </div>
+            <div id="menu-button">Menu</div>
+        </div>
+    </div>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Core Game Scripts -->
+    <script src="js/core/main.js"></script>
+    <script src="js/core/game.js"></script>
+    <script src="js/core/maze.js"></script>
+    <script src="js/core/player.js"></script>
+
+    <!-- UI & Component Scripts -->
+    <script src="js/ui/minimap.js"></script>
+    <script src="js/ui/menuSystem.js"></script>
+
+    <!-- Utilities -->
+    <script src="js/utils/controls.js"></script>
+    <script src="js/utils/fogOfWar.js"></script>
+
+    <!-- Start Game -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameInstance = new MazeRunner.Game();
+            gameInstance.init();
+        });
+    </script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 
 ## Game Overview
 
-Maze Runner is a top-down 2D maze exploration game where players must navigate through a complex maze while strategically uncovering as little of the map as possible. The game features a fog-of-war mechanic on the minimap, which gradually reveals areas as the player explores them. The unique twist is that players are rewarded for leaving more of the map unexplored, encouraging careful planning and efficient navigation.
+Maze Runner is a top-down 3D maze exploration game where players must navigate through a complex maze while strategically uncovering as little of the map as possible. The game features a fog-of-war mechanic on the minimap, which gradually reveals areas as the player explores them. The unique twist is that players are rewarded for leaving more of the map unexplored, encouraging careful planning and efficient navigation.
 
 ## Core Game Mechanics
 
@@ -76,7 +76,7 @@ Maze Runner is a top-down 2D maze exploration game where players must navigate t
 
 ### Client Components
 
-- 2D rendering engine for the maze and player
+- 3D rendering engine for the maze and player
 - User interface including minimap with fog of war
 - Input handling and player controls
 - Audio system for game sounds and music

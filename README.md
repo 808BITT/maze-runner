@@ -1,124 +1,113 @@
 # Maze Runner
 
-Maze Runner is a top-down 2D maze exploration game with fog of war mechanics. Players navigate through procedurally generated mazes while revealing as little of the map as possible. The game rewards efficiency and strategic planning.
+A top-down 3D maze exploration game built with Three.js, where players must navigate through procedurally generated mazes while strategically uncovering as little of the map as possible.
+
+![Maze Runner Game](assets/screenshots/game_preview.png)
+
+## Game Overview
+
+Maze Runner challenges players to navigate through complex mazes with a unique twist - you're rewarded for leaving more of the map unexplored. The game features a fog-of-war mechanic that gradually reveals areas as you explore, but your final score is higher when you can find the exit while uncovering minimal territory.
 
 ## Features
 
-- Procedurally generated mazes with varying difficulty levels.
-- Fog of war mechanics to challenge navigation skills.
-- Single-player mode with a focus on exploration and efficiency.
-- Player upgrades, including movement speed and vision range.
-- Leaderboards to track high scores and achievements.
+- Procedurally generated mazes with varying difficulty levels
+- Fog of war mechanic that rewards efficient navigation
+- Top-down 3D graphics powered by Three.js
+- Interactive minimap showing explored areas
+- Multiple difficulty options
+- Touch and keyboard controls
 
-## Prerequisites
+## Installation
 
-Before setting up the project, ensure you have the following installed:
+Maze Runner is a web-based game that runs directly in your browser without requiring any installation or build steps.
 
-- [Node.js](https://nodejs.org/) (v16 or later)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
+### Option 1: Run Locally (No Server)
 
-## Setup Instructions
+1. Clone or download this repository:
 
-1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/maze-runner.git
+   ```
 
-   ```bash
-   git clone <repository-url>
+2. Open `index.html` directly in your web browser.
+
+### Option 2: Using a Local Web Server (Recommended)
+
+For the best experience, especially to avoid potential CORS issues with textures and assets, it's recommended to use a local web server:
+
+1. Clone or download this repository:
+
+   ```
+   git clone https://github.com/yourusername/maze-runner.git
+   ```
+
+2. If you have Node.js installed, you can use a simple HTTP server like `http-server`:
+
+   ```
+   npm install -g http-server
    cd maze-runner
+   http-server
    ```
 
-2. Install dependencies for both the server and client:
+3. Or with Python:
 
-   ```bash
-   npm run install:all
+   ```
+   # Python 3
+   cd maze-runner
+   python -m http.server 8000
+   
+   # Python 2
+   cd maze-runner
+   python -m SimpleHTTPServer 8000
    ```
 
-3. Create a `.env` file in the root directory and add the following environment variables:
+4. Open your browser and navigate to `http://localhost:8000`
 
-   ```env
-   PORT=5000
-   DEBUG=true
-   MONGO_URI=<your-mongodb-connection-string>
-   JWT_SECRET=<your-jwt-secret>
-   ```
+## How to Play
 
-4. (Optional) To enable client-side debug logging, create a `.env` file in the `client` directory and add:
+- **Movement**: Use WASD or Arrow keys to move
+- **Menu**: Click the Menu button at the top of the screen
+- **Objective**: Find the exit (red marker) while revealing as little of the maze as possible
+- **Score**: Your score is based on the percentage of fog remaining when you reach the exit
 
-   ```env
-   REACT_APP_DEBUG=true
-   ```
+## Browser Compatibility
 
-## Running the Project
+Maze Runner works best in modern browsers that support WebGL:
 
-### Development Mode
+- Google Chrome (recommended)
+- Firefox
+- Edge
+- Safari (latest version)
 
-To run both the server and client in development mode:
+## Development
 
-```bash
-npm run dev
-```
+Maze Runner is built with:
 
-- The server will run on `http://localhost:5000`.
-- The client will run on `http://localhost:3000`.
+- Three.js for 3D rendering
+- Vanilla JavaScript
+- HTML5 and CSS
 
-### Production Build
-
-To build the client for production:
-
-```bash
-npm run build
-```
-
-The production-ready files will be located in the `client/dist` directory.
-
-### Starting the Server
-
-To start the server in production mode:
-
-```bash
-npm start
-```
-
-## Project Structure
+The codebase follows a modular structure:
 
 ```
-maze-runner/
-├── client/               # Frontend React application
-│   ├── public/           # Static assets
-│   ├── src/              # Source code
-│   │   ├── components/   # React components
-│   │   ├── utils/        # Utility functions
-│   │   └── App.jsx       # Main application entry point
-│   └── vite.config.js    # Vite configuration
-├── server/               # Backend Node.js application
-│   ├── controllers/      # Business logic
-│   ├── routes/           # API routes
-│   ├── utils/            # Utility functions
-│   └── index.js          # Server entry point
-├── .env                  # Environment variables
-├── package.json          # Project metadata and scripts
-└── README.md             # Project documentation
+js/
+├── core/          # Core game mechanics
+├── ui/            # User interface components
+└── utils/         # Utility functions and systems
 ```
-
-## Scripts
-
-The following scripts are available in the `package.json` file:
-
-- `npm run start`: Start the server in production mode.
-- `npm run dev`: Run both the server and client in development mode.
-- `npm run dev:server`: Run the server in development mode with hot reloading.
-- `npm run dev:client`: Run the client in development mode.
-- `npm run install:all`: Install dependencies for both the server and client.
-- `npm run build`: Build the client for production.
-
-## Debugging
-
-- Server-side debugging can be enabled by setting `DEBUG=true` in the `.env` file.
-- Client-side debugging can be enabled by setting `REACT_APP_DEBUG=true` in the `client/.env` file.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
 ## License
 
-This project is licensed under the ISC License. See the `LICENSE` file for details.
+[MIT License](LICENSE)
+
+## Credits
+
+Developed by [Your Name]
+
+## Future Updates
+
+- Battle Royale mode
+- Tactical Team mode
+- Character customization
+- More maze generation algorithms
+- Additional power-ups and special abilities
