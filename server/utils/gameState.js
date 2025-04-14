@@ -11,9 +11,9 @@ const activeGames = new Map();
 const DEBUG = process.env.DEBUG === 'true';
 
 function logDebug(message, ...optionalParams) {
-    if (DEBUG) {
-        console.debug(`[DEBUG] ${message}`, ...optionalParams);
-    }
+    // if (DEBUG) {
+    //     console.debug(`[DEBUG] ${message}`, ...optionalParams);
+    // }
 }
 
 /**

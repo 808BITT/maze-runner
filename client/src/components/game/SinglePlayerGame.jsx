@@ -25,10 +25,13 @@ const SinglePlayerGame = () => {
     const [difficulty, setDifficulty] = useState('medium');
     const [showDifficultyMenu, setShowDifficultyMenu] = useState(true);
     const [error, setError] = useState(null);
+    const [viewRadius, setViewRadius] = useState(5); // Visibility radius around player
+    const [showFullMap, setShowFullMap] = useState(false); // Toggle between main view and map view
 
     const socketRef = useRef();
     const canvasRef = useRef();
     const fogCanvasRef = useRef();
+    const containerRef = useRef();
 
     // Handle difficulty selection and start game
     const startGame = (selectedDifficulty) => {
@@ -97,7 +100,7 @@ const SinglePlayerGame = () => {
         });
     };
 
-    // Handle keyboard inputs for player movement
+    // Handle keyboard inputs for player movement and map toggle
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameState || gameState.status !== 'active') return;
@@ -124,6 +127,15 @@ const SinglePlayerGame = () => {
                 case 'h': // Vim left
                     direction = 'left';
                     break;
+                case 'm': // Toggle map view
+                    setShowFullMap(prev => !prev);
+                    return; // Don't send movement
+                case '+':
+                    adjustViewRadius(1);
+                    return;
+                case '-':
+                    adjustViewRadius(-1);
+                    return;
                 default:
                     return;
             }
@@ -142,17 +154,26 @@ const SinglePlayerGame = () => {
         };
     }, [gameState]);
 
-    // Render maze, fog, and player when game state updates
+    // Update the rendering logic to center the map on the screen
     useEffect(() => {
         if (!gameState) return;
 
         const mazeCanvas = canvasRef.current;
         const fogCanvas = fogCanvasRef.current;
+        const container = containerRef.current;
 
-        if (!mazeCanvas || !fogCanvas) return;
+        if (!mazeCanvas || !fogCanvas || !container) return;
 
         const mazeCtx = mazeCanvas.getContext('2d');
         const fogCtx = fogCanvas.getContext('2d');
+
+        // Ensure canvas dimensions match maze dimensions
+        const mazeWidth = gameState.maze.width * 20; // Assuming each cell is 20px
+        const mazeHeight = gameState.maze.height * 20;
+        mazeCanvas.width = mazeWidth;
+        mazeCanvas.height = mazeHeight;
+        fogCanvas.width = mazeWidth;
+        fogCanvas.height = mazeHeight;
 
         // Clear canvases
         mazeCtx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
@@ -161,13 +182,42 @@ const SinglePlayerGame = () => {
         // Render maze background
         renderMaze(mazeCtx, gameState.maze);
 
-        // Render fog of war overlay
-        renderFogOfWar(fogCtx, gameState.fogGrid);
+        // Render fog of war overlay with player position and view radius
+        renderFogOfWar(fogCtx, gameState.fogGrid, gameState.playerPosition, viewRadius, gameState.maze.grid);
 
-        // Render player
+        // Render player on the maze canvas
         renderPlayer(mazeCtx, gameState.playerPosition, gameState.maze);
 
-    }, [gameState]);
+        // Center the map in the container
+        const containerWidth = container.offsetWidth;
+        const containerHeight = container.offsetHeight;
+
+        const scaleX = containerWidth / mazeWidth;
+        const scaleY = containerHeight / mazeHeight;
+        const scale = Math.min(scaleX, scaleY, 1); // Ensure we don't scale up beyond 1
+
+        mazeCanvas.style.transform = `scale(${scale})`;
+        fogCanvas.style.transform = `scale(${scale})`;
+
+        const offsetX = (containerWidth - mazeWidth * scale) / 2;
+        const offsetY = (containerHeight - mazeHeight * scale) / 2;
+
+        mazeCanvas.style.position = 'absolute';
+        fogCanvas.style.position = 'absolute';
+        mazeCanvas.style.left = `${offsetX}px`;
+        mazeCanvas.style.top = `${offsetY}px`;
+        fogCanvas.style.left = `${offsetX}px`;
+        fogCanvas.style.top = `${offsetY}px`;
+
+        // Reset transform origin to ensure proper scaling
+        mazeCanvas.style.transformOrigin = 'top left';
+        fogCanvas.style.transformOrigin = 'top left';
+
+        // Trigger rendering after ensuring dimensions and scaling are set
+        renderMaze(mazeCtx, gameState.maze);
+        renderFogOfWar(fogCtx, gameState.fogGrid, gameState.playerPosition, viewRadius, gameState.maze.grid);
+        renderPlayer(mazeCtx, gameState.playerPosition, gameState.maze);
+    }, [gameState, viewRadius]);
 
     // Clean up socket connection when component unmounts
     useEffect(() => {
@@ -184,6 +234,16 @@ const SinglePlayerGame = () => {
             socketRef.current.disconnect();
         }
         navigate('/');
+    };
+
+    // Adjust view radius (zooming in/out)
+    const adjustViewRadius = (amount) => {
+        setViewRadius(prev => Math.max(3, Math.min(10, prev + amount)));
+    };
+
+    // Toggle map view
+    const toggleMapView = () => {
+        setShowFullMap(prev => !prev);
     };
 
     // Render difficulty selection menu
@@ -223,7 +283,7 @@ const SinglePlayerGame = () => {
     }
 
     return (
-        <div className="game-container">
+        <div className={`game-container ${showFullMap ? 'map-mode' : ''}`}>
             {/* Game HUD */}
             <div className="game-hud">
                 <div className="stats">
@@ -241,11 +301,22 @@ const SinglePlayerGame = () => {
                     </div>
                 </div>
 
-                <button className="exit-button" onClick={exitToMainMenu}>Exit</button>
+                <div className="game-controls">
+                    <button className="control-button" onClick={() => adjustViewRadius(1)} title="Zoom Out">+</button>
+                    <button className="control-button" onClick={() => adjustViewRadius(-1)} title="Zoom In">-</button>
+                    <button
+                        className={`control-button map-toggle ${showFullMap ? 'active' : ''}`}
+                        onClick={toggleMapView}
+                        title="Toggle Map View"
+                    >
+                        {showFullMap ? 'Player View' : 'Map View'}
+                    </button>
+                    <button className="exit-button" onClick={exitToMainMenu}>Exit</button>
+                </div>
             </div>
 
             {/* Game Canvas */}
-            <div className="canvas-container">
+            <div className="canvas-container" ref={containerRef}>
                 <canvas
                     ref={canvasRef}
                     width={gameState?.maze.width * 20}
@@ -260,41 +331,9 @@ const SinglePlayerGame = () => {
                 />
             </div>
 
-            {/* Mini-map with fog of war */}
-            <div className="minimap-container">
-                <h3>Minimap</h3>
-                <div className="minimap">
-                    {gameState?.maze.grid.map((row, y) => (
-                        <div key={`row-${y}`} className="minimap-row">
-                            {row.map((cell, x) => {
-                                // Define cell type
-                                let cellType = '';
-                                if (cell === 1) cellType = 'wall';
-                                else if (cell === 2) cellType = 'start';
-                                else if (cell === 3) cellType = 'exit';
-                                else cellType = 'path';
-
-                                // Add player marker
-                                const isPlayer = gameState.playerPosition.x === x && gameState.playerPosition.y === y;
-
-                                // Add fog
-                                const isFogged = gameState.fogGrid[y][x] === 1;
-
-                                return (
-                                    <div
-                                        key={`cell-${x}-${y}`}
-                                        className={`minimap-cell ${cellType} ${isPlayer ? 'player' : ''} ${isFogged ? 'fogged' : ''}`}
-                                    />
-                                );
-                            })}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Controls help */}
             <div className="controls-help">
-                <p>Use WASD, Arrow keys, or Vim keys (HJKL) to move</p>
+                <p>Use WASD, Arrow keys, or Vim keys (HJKL) to move | +/- to adjust view range | Press M to toggle map view</p>
             </div>
         </div>
     );

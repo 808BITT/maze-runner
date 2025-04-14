@@ -155,23 +155,24 @@ class MazeGenerator {
      */
     _ensurePathToExit(maze, startX, startY, exitX, exitY) {
         logDebug('Ensuring path to exit', { startX, startY, exitX, exitY });
-        // Simple implementation: create a direct path if exit is on the edge
-        if (exitX === 0 || exitY === 0 || exitX === maze[0].length - 1 || exitY === maze.length - 1) {
-            // Create a path to the nearest point we've already carved
-            let currentX = exitX;
-            let currentY = exitY;
 
-            while (maze[currentY][currentX] !== 0) {
-                logDebug('Carving direct path to exit', { currentX, currentY });
-                maze[currentY][currentX] = 0;
+        // Create a direct orthogonal path to the exit
+        let currentX = startX;
+        let currentY = startY;
 
-                // Move towards the center
-                if (currentX < startX) currentX++;
-                else if (currentX > startX) currentX--;
-
-                if (currentY < startY) currentY++;
-                else if (currentY > startY) currentY--;
+        while (currentX !== exitX || currentY !== exitY) {
+            if (currentX < exitX) {
+                currentX++;
+            } else if (currentX > exitX) {
+                currentX--;
+            } else if (currentY < exitY) {
+                currentY++;
+            } else if (currentY > exitY) {
+                currentY--;
             }
+
+            // Mark the path as clear
+            maze[currentY][currentX] = 0;
         }
     }
 
