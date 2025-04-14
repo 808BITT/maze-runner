@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import './SinglePlayerGame.css';
+import ThreeDMaze from './ThreeDMaze';
 
 // Import game utilities
-import { renderFogOfWar, renderMaze, renderPlayer } from '../../utils/gameRenderer';
 
 // Add a debug flag to enable or disable logging
 const DEBUG = import.meta.env.VITE_DEBUG === 'true';
@@ -32,6 +32,7 @@ const SinglePlayerGame = () => {
     const canvasRef = useRef();
     const fogCanvasRef = useRef();
     const containerRef = useRef();
+
 
     // Handle difficulty selection and start game
     const startGame = (selectedDifficulty) => {
